@@ -72,3 +72,27 @@ module.exports.getUser = (req, res, next) => {
       next(err);
     });
 };
+
+module.exports.updateUserInfo = (req, res, next) => {
+  const { _id: userId } = req.user;
+  const { name, email } = req.body;
+  User.findByIdAndUpdate(
+    userId,
+    { name, email },
+    { new: true, runValidators: true },
+  ).orFail()
+    .then((user) => {
+      res.send(user.toObject());
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new httpErrors.NotFoundError('Пользователь не найден'));
+        return;
+      }
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new httpErrors.BadRequestError(err.message));
+        return;
+      }
+      next(err);
+    });
+};
