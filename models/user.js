@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const validationMessages = require('../errors/validation');
+const authErrors = require('../errors/auth');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -33,5 +35,28 @@ userSchema.set('toObject', {
     return ret;
   },
 });
+
+function loginFailedReject() {
+  return Promise.reject(new authErrors.CredentialsNotValidError());
+}
+
+// eslint-disable-next-line func-names
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return loginFailedReject();
+      }
+
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return loginFailedReject();
+          }
+
+          return user;
+        });
+    });
+};
 
 module.exports = mongoose.model('user', userSchema);
