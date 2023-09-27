@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errors = require('./middlewares/errors');
+const httpErrors = require('./errors/http');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/filmexpdb' } = process.env;
 
@@ -21,6 +22,8 @@ app.post('/signup', createUser);
 app.post('/signin', login);
 
 app.use(auth);
+
+app.use((req, res, next) => next(new httpErrors.NotFoundError('Неправильный путь')));
 
 app.use(errors);
 
