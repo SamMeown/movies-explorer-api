@@ -52,3 +52,23 @@ module.exports.login = (req, res, next) => {
       next(err);
     });
 };
+
+module.exports.getUser = (req, res, next) => {
+  const { _id: userId } = req.user;
+  User.findById(userId).orFail()
+    .then((user) => {
+      res.send(user.toObject());
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new httpErrors.NotFoundError('Пользователь не найден'));
+        return;
+      }
+      if (err instanceof mongoose.Error.CastError) {
+        next(new httpErrors.BadRequestError(err.message));
+        return;
+      }
+
+      next(err);
+    });
+};

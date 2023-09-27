@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const { createUser, login } = require('./controllers/users');
+const usersApi = require('./routes/users');
 const auth = require('./middlewares/auth');
 const errors = require('./middlewares/errors');
 const httpErrors = require('./errors/http');
@@ -22,6 +23,8 @@ app.post('/signup', createUser);
 app.post('/signin', login);
 
 app.use(auth);
+
+app.use('/users', usersApi);
 
 app.use((req, res, next) => next(new httpErrors.NotFoundError('Неправильный путь')));
 
