@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const { errors: validationErrors } = require('celebrate');
 
 const { createUser, login } = require('./controllers/users');
@@ -20,6 +21,7 @@ mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 });
 
+app.use(helmet());
 app.use(bodyParser.json());
 
 app.post('/signup', validateCreateUser, createUser);
