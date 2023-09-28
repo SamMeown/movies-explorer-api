@@ -2,8 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors: validationErrors } = require('celebrate');
 
 const { createUser, login } = require('./controllers/users');
+const { validateCreateUser, validateLogin } = require('./validators/user');
 const usersApi = require('./routes/users');
 const moviesApi = require('./routes/movies');
 const auth = require('./middlewares/auth');
@@ -20,8 +22,8 @@ mongoose.connect(DB_URL, {
 
 app.use(bodyParser.json());
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', validateCreateUser, createUser);
+app.post('/signin', validateLogin, login);
 
 app.use(auth);
 
@@ -30,6 +32,7 @@ app.use('/movies', moviesApi);
 
 app.use((req, res, next) => next(new httpErrors.NotFoundError('Неправильный путь')));
 
+app.use(validationErrors());
 app.use(errors);
 
 app.listen(PORT, () => {
