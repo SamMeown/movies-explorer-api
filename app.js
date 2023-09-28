@@ -11,6 +11,7 @@ const usersApi = require('./routes/users');
 const moviesApi = require('./routes/movies');
 const auth = require('./middlewares/auth');
 const cors = require('./middlewares/cors');
+const { requestLogger, errorLogger } = require('./middlewares/logging');
 const errors = require('./middlewares/errors');
 const httpErrors = require('./errors/http');
 
@@ -25,6 +26,8 @@ mongoose.connect(DB_URL, {
 app.use(helmet());
 app.use(bodyParser.json());
 
+app.use(requestLogger);
+
 app.use(cors);
 
 app.post('/signup', validateCreateUser, createUser);
@@ -36,6 +39,8 @@ app.use('/users', usersApi);
 app.use('/movies', moviesApi);
 
 app.use((req, res, next) => next(new httpErrors.NotFoundError('Неправильный путь')));
+
+app.use(errorLogger);
 
 app.use(validationErrors());
 app.use(errors);
