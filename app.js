@@ -10,6 +10,7 @@ const { validateCreateUser, validateLogin } = require('./validators/user');
 const usersApi = require('./routes/users');
 const moviesApi = require('./routes/movies');
 const auth = require('./middlewares/auth');
+const cors = require('./middlewares/cors');
 const errors = require('./middlewares/errors');
 const httpErrors = require('./errors/http');
 
@@ -23,6 +24,8 @@ mongoose.connect(DB_URL, {
 
 app.use(helmet());
 app.use(bodyParser.json());
+
+app.use(cors);
 
 app.post('/signup', validateCreateUser, createUser);
 app.post('/signin', validateLogin, login);
