@@ -89,6 +89,10 @@ module.exports.updateUserInfo = (req, res, next) => {
         next(new httpErrors.NotFoundError('Пользователь не найден'));
         return;
       }
+      if (err instanceof MongoServerError && err.code === 11000) {
+        next(new httpErrors.ConflictError(err.message));
+        return;
+      }
       if (err instanceof mongoose.Error.ValidationError) {
         next(new httpErrors.BadRequestError(err.message));
         return;
