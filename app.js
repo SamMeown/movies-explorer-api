@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 
 const { createUser, login } = require('./controllers/users');
 const usersApi = require('./routes/users');
+const moviesApi = require('./routes/movies');
 const auth = require('./middlewares/auth');
 const errors = require('./middlewares/errors');
 const httpErrors = require('./errors/http');
@@ -25,6 +26,7 @@ app.post('/signin', login);
 app.use(auth);
 
 app.use('/users', usersApi);
+app.use('/movies', moviesApi);
 
 app.use((req, res, next) => next(new httpErrors.NotFoundError('Неправильный путь')));
 
